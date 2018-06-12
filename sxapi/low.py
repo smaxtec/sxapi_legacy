@@ -591,7 +591,7 @@ class LowLevelInternAPI(BaseAPI):
         res = self.get("/devicesearch", params=p)
         return res
 
-    def get_device_uploads(from_ts, to_ts, device_id):
+    def get_device_uploads(self, from_ts, to_ts, device_id):
         params = HDict({
             "device_id": device_id,
             "from_date": from_ts,
@@ -603,3 +603,19 @@ class LowLevelInternAPI(BaseAPI):
         p = HDict({"organisation_id": organisation_id})
         res = self.get("/animallist", params=p)
         return res
+
+    def move_device(self, device_id, organisation_id):
+        p = HDict({"organisation_id": organisation_id, "device_id": device_id})
+        res = self.post("/organisation/move_device", json=p, version="v1")
+        return res
+
+    def deactivate_device(self, device_id, activation_code):
+        p = HDict({"device_id": device_id, "activation_code": activation_code})
+        res = self.post("/organisation/deactivate_device", json=p, version="v1")
+        return res
+
+    def move_animal(self, animal_id, organisation_id):
+        p = HDict({"animal_id": animal_id, "organisation_id": organisation_id})
+        res = self.post("/organisation/move_animal", json=p, version="v1")
+        return res
+        

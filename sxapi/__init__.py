@@ -266,6 +266,15 @@ class LowLevelAPI(object):
     def update_organisation_partner(self, organisation_id, partner_id):
         return self.privatelow.update_organisation_partner(organisation_id, partner_id)
 
+    def move_device(self, device_id, organisation_id):
+        return self.privatelow.move_device(device_id, organisation_id)
+
+    def deactivate_device(self, device_id, activation_code):
+        return self.privatelow.deactivate_device(device_id, activation_code)
+
+    def move_animal(self, animal_id, organisation_id):
+        return self.privatelow.move_animal(animal_id, organisation_id)
+
     # User Calls
 
     def get_user_by_id(self, user_id):
