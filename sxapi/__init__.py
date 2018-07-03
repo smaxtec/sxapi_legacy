@@ -10,7 +10,7 @@ from .low import LowLevelPublicAPI, LowLevelInternAPI
 from .models import User, Animal, Organisation, Annotation
 from .helper import fromTS, toTS
 
-__version__ = '0.13'
+__version__ = '0.14'
 
 
 class API(object):
