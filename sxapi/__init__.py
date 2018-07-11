@@ -292,6 +292,9 @@ class LowLevelAPI(object):
     def create_hidden_share(self, organisation_id, user_id):
         return self.privatelow.create_hidden_share(organisation_id, user_id)
 
+    def activate_user(self, email):
+        return self.privatelow.activate_user(email)
+
     # Testset Calls
 
     def insert_testset(self, name, meta_data, annotation_ids):

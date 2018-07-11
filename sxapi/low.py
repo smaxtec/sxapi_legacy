@@ -73,7 +73,8 @@ class BaseAPI(object):
     def to_url(self, path, version_modifier=None):
         url = "{}{}".format(self.api_base_url, path)
         if version_modifier is not None:
-            url = re.sub('\/[vV][0-9]+\/', "/{}/".format(version_modifier), url)
+            url = re.sub('\/[vV][0-9]+\/',
+                         "/{}/".format(version_modifier), url)
         return url
 
     def _login(self):
@@ -86,7 +87,8 @@ class BaseAPI(object):
         # try to use api key
         if self.api_key:
             self._session_key = self.api_key
-            self._session.headers.update({"Authorization": "Bearer {}".format(self._session_key)})
+            self._session.headers.update(
+                {"Authorization": "Bearer {}".format(self._session_key)})
             self._session_expiration = time.time() + 365 * 24 * 60 * 60
             return True
         # login with credentials
@@ -101,7 +103,8 @@ class BaseAPI(object):
         else:
             res.raise_for_status()
         self._session_key = res.json()["token"]
-        self._session.headers.update({"Authorization": "Bearer {}".format(self._session_key)})
+        self._session.headers.update(
+            {"Authorization": "Bearer {}".format(self._session_key)})
         self._session_expiration = time.time() + 23 * 60 * 60
         return True
 
@@ -112,7 +115,8 @@ class BaseAPI(object):
         r = self.session.get(url, *args, **kwargs)
         self.track_request(url, r.status_code, start)
         if 400 <= r.status_code < 500:
-            raise HTTPError("{} Error: {}".format(r.status_code, r.json().get("message", "unknown")))
+            raise HTTPError("{} Error: {}".format(
+                r.status_code, r.json().get("message", "unknown")))
         r.raise_for_status()
         return r.json()
 
@@ -125,7 +129,8 @@ class BaseAPI(object):
         if r.status_code == 301:
             raise HTTPError("301 redirect for POST")
         if 400 <= r.status_code < 500:
-            raise HTTPError("{} Error: {}".format(r.status_code, r.json().get("message", "unknown")))
+            raise HTTPError("{} Error: {}".format(
+                r.status_code, r.json().get("message", "unknown")))
         r.raise_for_status()
         return r.json()
 
@@ -138,7 +143,8 @@ class BaseAPI(object):
         if r.status_code == 301:
             raise HTTPError("301 redirect for PUT")
         if 400 <= r.status_code < 500:
-            raise HTTPError("{} Error: {}".format(r.status_code, r.json().get("message", "unknown")))
+            raise HTTPError("{} Error: {}".format(
+                r.status_code, r.json().get("message", "unknown")))
         r.raise_for_status()
         return r.json()
 
@@ -149,7 +155,8 @@ class BaseAPI(object):
         r = self.session.delete(url, *args, **kwargs)
         self.track_request(url, r.status_code, start)
         if 400 <= r.status_code < 500:
-            raise HTTPError("{} Error: {}".format(r.status_code, r.json().get("message", "unknown")))
+            raise HTTPError("{} Error: {}".format(
+                r.status_code, r.json().get("message", "unknown")))
         r.raise_for_status()
         return r.json()
 
@@ -159,7 +166,8 @@ class LowLevelPublicAPI(BaseAPI):
         """Initialize a new low level API client instance.
         """
         ep = endpoint or PUBLIC_API
-        super(LowLevelPublicAPI, self).__init__(ep, email=email, password=password, api_key=api_key, tz_aware=tz_aware)
+        super(LowLevelPublicAPI, self).__init__(ep, email=email,
+                                                password=password, api_key=api_key, tz_aware=tz_aware)
 
     def get_status(self):
         return self.get("/service/status")
@@ -196,7 +204,8 @@ class LowLevelPublicAPI(BaseAPI):
     def get_device_sensordata(self, device_id, metric, from_date, to_date):
         data = []
         for f, t in splitTimeRange(from_date, to_date, 100):
-            data += self._get_device_sensordata(device_id, metric, f, t)["data"]
+            data += self._get_device_sensordata(device_id,
+                                                metric, f, t)["data"]
         return data
 
     def _get_device_sensordata(self, device_id, metric, from_date, to_date):
@@ -207,7 +216,8 @@ class LowLevelPublicAPI(BaseAPI):
     def get_animal_sensordata(self, animal_id, metric, from_date, to_date):
         data = []
         for f, t in splitTimeRange(from_date, to_date, 100):
-            data += self._get_animal_sensordata(animal_id, metric, f, t)["data"]
+            data += self._get_animal_sensordata(animal_id,
+                                                metric, f, t)["data"]
         return data
 
     def _get_animal_sensordata(self, animal_id, metric, from_date, to_date):
@@ -336,7 +346,8 @@ class LowLevelPublicAPI(BaseAPI):
         return res
 
     def insert_testset(self, name, meta_data, annotation_ids):
-        p = HDict({"name": name, "meta_data": meta_data, "annotation_ids": annotation_ids})
+        p = HDict({"name": name, "meta_data": meta_data,
+                   "annotation_ids": annotation_ids})
         res = self.put("/annotation/testset", json=p, timeout=25)
         return res
 
@@ -369,7 +380,8 @@ class LowLevelInternAPI(BaseAPI):
         """
         if not endpoint:
             raise ValueError("Endpoint needed for low level API")
-        super(LowLevelInternAPI, self).__init__(endpoint, api_key=api_key, tz_aware=tz_aware)
+        super(LowLevelInternAPI, self).__init__(
+            endpoint, api_key=api_key, tz_aware=tz_aware)
 
     def get_status(self):
         return self._api_status()
@@ -541,12 +553,14 @@ class LowLevelInternAPI(BaseAPI):
         return res
 
     def getNodeInfos(self, device_id, from_date, to_date):
-        p = HDict({"device_id": device_id, "from_date": int(from_date), "to_date": int(to_date)})
+        p = HDict({"device_id": device_id, "from_date": int(
+            from_date), "to_date": int(to_date)})
         res = self.get("/nodeinfobulk", params=p)
         return res
 
     def getUploads(self, device_id, from_date, to_date):
-        p = HDict({"device_id": device_id, "from_date": int(from_date), "to_date": int(to_date)})
+        p = HDict({"device_id": device_id, "from_date": int(
+            from_date), "to_date": int(to_date)})
         res = self.get("/anthilluploadbulk", params=p)
         return res
 
@@ -572,7 +586,8 @@ class LowLevelInternAPI(BaseAPI):
 
     def get_hidden_shares(self, user_id):
         params = HDict({"user_id": user_id})
-        res = self.get("/user/hidden_shares_by_user", params=params, version="v1")
+        res = self.get("/user/hidden_shares_by_user",
+                       params=params, version="v1")
         return res
 
     def delete_hidden_share(self, share_id):
@@ -584,6 +599,11 @@ class LowLevelInternAPI(BaseAPI):
         params = HDict({"organisation_id": organisation_id,
                         "user_id": user_id})
         res = self.put("/user/hidden_share", json=params, version="v1")
+        return res
+
+    def activate_user(self, email):
+        p = HDict({"user_email": email})
+        res = self.put("/user/activate", json=p, version="v1")
         return res
 
     def search_devices(self, search_string):
