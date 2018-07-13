@@ -638,4 +638,23 @@ class LowLevelInternAPI(BaseAPI):
         p = HDict({"animal_id": animal_id, "organisation_id": organisation_id})
         res = self.post("/organisation/move_animal", json=p, version="v1")
         return res
-        
+
+    def getGroupSensorDataBulk(self, group_id, metrics, from_date, to_date):
+        params = HDict({"group_id": group_id, "metrics": list(metrics),
+                        "from_date": from_date, "to_date": to_date})
+        res = self.get("/groupsensordatabulk", params=params, timeout=15)
+        return res
+
+    def insertGroupSensorDataBulk(self, sensordata):
+        data = HDict({"sensordata": list(sensordata)})
+        for s in sensordata:
+            d = s["data"]
+            for point in d:
+                if not isinstance(point[0], (int, float)):
+                    raise ValueError("Invalid TS Point: %s of metric %s",
+                                     (point, s["metric"]))
+                if not isinstance(point[1], (int, float)):
+                    raise ValueError("Invalid VALUE Point: %s of metric %s",
+                                     (point, s["metric"]))
+        res = self.put("/groupsensordatabulk", json=data, timeout=25)
+        return res

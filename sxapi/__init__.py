@@ -64,7 +64,8 @@ class LowLevelAPI(object):
 
     @property
     def _privatelow(self):
-        raise RuntimeError("internal API not accessable without endpoint and token")
+        raise RuntimeError(
+            "internal API not accessable without endpoint and token")
 
     # Status Calls
 
@@ -208,15 +209,18 @@ class LowLevelAPI(object):
                                          with_allmeta=with_allmeta)
 
     def getOrganisation(self, organisation_id):
-        warnings.warn("getOrganisation (internal) is deprecated. use get_organisation_by_id", DeprecationWarning)
+        warnings.warn(
+            "getOrganisation (internal) is deprecated. use get_organisation_by_id", DeprecationWarning)
         return self.privatelow.getOrganisation(organisation_id)
 
     def getAnimal(self, animal_id):
-        warnings.warn("getAnimal (internal) is deprecated. use get_animal_by_id", DeprecationWarning)
+        warnings.warn(
+            "getAnimal (internal) is deprecated. use get_animal_by_id", DeprecationWarning)
         return self.privatelow.getAnimal(animal_id)
 
     def getOrganisationList(self):
-        warnings.warn("getOrganisationList (internal) is deprecated. use query_organisations", DeprecationWarning)
+        warnings.warn(
+            "getOrganisationList (internal) is deprecated. use query_organisations", DeprecationWarning)
         return self.privatelow.getOrganisationList()
 
     def get_devices_seen(self, device_id, hours_back=24, return_sum=True, to_ts=None):
@@ -308,3 +312,9 @@ class LowLevelAPI(object):
 
     def get_testset_by_name(self, name):
         return self.publiclow.get_testset_by_name(name)
+
+    def getGroupSensorDataBulk(self, group_id, metrics, from_date, to_date):
+        return self.privatelow.getGroupSensorDataBulk(group_id, metrics, from_date, to_date)
+
+    def insertGroupSensorDataBulk(self, sensordata):
+        return self.privatelow.insertGroupSensorDataBulk(sensordata)
