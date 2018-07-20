@@ -1,6 +1,8 @@
 # sxapi
 smaXtec API Client
 
+[![Build Status](https://travis-ci.org/wuttem/sxapi.svg?branch=develop)](https://travis-ci.org/wuttem/sxapi)
+
 Python wrapper for the smaXtec public API
 
 ## Usage ##
