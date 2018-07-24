@@ -208,9 +208,10 @@ class LowLevelAPI(object):
                                          with_organisation=with_organisation,
                                          with_allmeta=with_allmeta)
 
+    def get_interal_organisation_by_id(self, organisation_id):
+        return self.privatelow.getOrganisation(organisation_id)
+
     def getOrganisation(self, organisation_id):
-        warnings.warn(
-            "getOrganisation (internal) is deprecated. use get_organisation_by_id", DeprecationWarning)
         return self.privatelow.getOrganisation(organisation_id)
 
     def getAnimal(self, animal_id):
