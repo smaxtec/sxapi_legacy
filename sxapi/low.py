@@ -537,7 +537,7 @@ class LowLevelInternAPI(BaseAPI):
 
     def getLastUnconfirmedLactDate(self, lactation_id):
         p = HDict({"lactation_id": lactation_id})
-        res = self.get("animal/lactation_history_confirmed", version="v1", params=p)
+        res = self.get("/animal/lactation_history_confirmed", version="v1", params=p)
         return res
 
     def update_organisation_partner(self, organisation_id, partner_id):
