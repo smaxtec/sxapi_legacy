@@ -8,7 +8,7 @@ Python wrapper for the smaXtec public API
 ## Usage ##
 To use the API smaXtec user credentials (smaXtec Messenger Account) are needed.
 
-```
+```python
 from sxapi import API
 
 a = API(email="myuser@smaxtec.com", password="mypassword")
@@ -47,7 +47,7 @@ See: https://pendulum.eustace.io/docs/
 
 To deactivate this behaviour create API Clients with *tz_aware=False*
 
-```
+```python
 from sxapi import API
 
 a = API(email="myuser@smaxtec.com", password="mypassword", tz_aware=False)
@@ -56,7 +56,7 @@ a = API(email="myuser@smaxtec.com", password="mypassword", tz_aware=False)
 
 ## Low Level Usage ##
 
-```
+```python
 from sxapi import LowLevelAPI
 
 a = LowLevelAPI(email="user@smaxtec.com", password="mypassword")
@@ -72,7 +72,7 @@ print a.getAnimal("dsdsd") # from internal works only with api key
 The API Client includes a Flask Extension Module for usage of the LowLevel API.
 Usage is only possible with a permanent API Token and an internal endpoint.
 
-```
+```python
 from flask import Flask, jsonify
 from sxapi.ext import FlaskSX
 
