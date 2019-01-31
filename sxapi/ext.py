@@ -98,6 +98,9 @@ class FlaskSX(object):
     def get_organisation_object(self, organisation_id):
         return self.highlevel.get_organisation(organisation_id)
 
+    def get_group_data_bulk(self, group_id, metrics, from_date, to_date):
+        return self.lowlevel.getGroupSensorDataBulk(group_id, metrics, from_date, to_date)
+
     # Find other API calls
     def __getattr__(self, item):
         if "init" in item:

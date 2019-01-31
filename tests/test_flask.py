@@ -8,6 +8,7 @@ import mock
 from flask import Flask
 
 from sxapi.ext import FlaskSX
+from .util import MockGet
 
 
 class TestConfig(object):
@@ -38,26 +39,26 @@ class FlaskTests(unittest.TestCase):
         with self.assertRaises(AttributeError):
             self.sxapi.hello()
 
-        with mock.patch('sxapi.low.BaseAPI.session') as patched_session:
+        with MockGet() as patched_session:
             u = self.sxapi.user
-            call = patched_session.get.call_args_list
-            self.assertEqual(call[0][0][0], "https://api.smaxtec.com/api/v1/user")
+            call = patched_session.call_args_list
+            self.assertEqual(call[0][0][0], "/user")
 
-        with mock.patch('sxapi.low.BaseAPI.session') as patched_session:
+        with MockGet() as patched_session:
             u = self.sxapi.get_animal_object("abcd").data
-            call = patched_session.get.call_args_list
-            self.assertEqual(call[0][0][0], "https://api.smaxtec.com/api/v1/animal/by_id")
+            call = patched_session.call_args_list
+            self.assertEqual(call[0][0][0], "/animal/by_id")
             self.assertEqual(call[0][1]["params"]["animal_id"], "abcd")
 
-        with mock.patch('sxapi.low.BaseAPI.session') as patched_session:
+        with MockGet() as patched_session:
             u = self.sxapi.get_organisation_object("abcd").data
-            call = patched_session.get.call_args_list
-            self.assertEqual(call[0][0][0], "https://api.smaxtec.com/api/v1/organisation/by_id")
+            call = patched_session.call_args_list
+            self.assertEqual(call[0][0][0], "/organisation/by_id")
             self.assertEqual(call[0][1]["params"]["organisation_id"], "abcd")
 
     def test_lowlevel_calls(self):
-        with mock.patch('sxapi.low.BaseAPI.session') as patched_session:
+        with MockGet() as patched_session:
             u = self.sxapi.get_animal_by_id("abcd")
-            call = patched_session.get.call_args_list
-            self.assertEqual(call[0][0][0], "https://api.smaxtec.com/api/v1/animal/by_id")
+            call = patched_session.call_args_list
+            self.assertEqual(call[0][0][0], "/animal/by_id")
             self.assertEqual(call[0][1]["params"]["animal_id"], "abcd")

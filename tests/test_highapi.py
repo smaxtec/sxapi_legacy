@@ -6,6 +6,7 @@ import time
 import mock
 
 from sxapi import API
+from .util import MockGet
 
 
 class HighApiTests(unittest.TestCase):
@@ -25,7 +26,7 @@ class HighApiTests(unittest.TestCase):
 
     def test_status(self):
         api = API(email=self.EMAIL, password=self.PASSWORD, endpoint=self.PUBLIC_ENDPOINT)
-        with mock.patch('sxapi.low.BaseAPI.session') as patched_session:
+        with MockGet() as patched_session:
             r = api.status
-            call = patched_session.get.call_args_list
-            self.assertEqual(call[0][0][0], "http://0.0.0.0:8989/publicapi/v1/service/status")
+            call = patched_session.call_args_list
+            self.assertEqual(call[0][0][0], "/service/status")
