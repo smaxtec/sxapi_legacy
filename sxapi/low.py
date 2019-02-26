@@ -115,8 +115,12 @@ class BaseAPI(object):
         r = self.session.get(url, *args, **kwargs)
         self.track_request(url, r.status_code, start)
         if 400 <= r.status_code < 500:
+            try:
+                msg = r.json().get("message", "unknown")
+            except Exception as e:
+                msg = "unknown"
             raise HTTPError("{} Error: {}".format(
-                r.status_code, r.json().get("message", "unknown")))
+                r.status_code, msg))
         r.raise_for_status()
         return r.json()
 
@@ -129,8 +133,12 @@ class BaseAPI(object):
         if r.status_code == 301:
             raise HTTPError("301 redirect for POST")
         if 400 <= r.status_code < 500:
+            try:
+                msg = r.json().get("message", "unknown")
+            except Exception as e:
+                msg = "unknown"
             raise HTTPError("{} Error: {}".format(
-                r.status_code, r.json().get("message", "unknown")))
+                r.status_code, msg))
         r.raise_for_status()
         return r.json()
 
@@ -143,8 +151,12 @@ class BaseAPI(object):
         if r.status_code == 301:
             raise HTTPError("301 redirect for PUT")
         if 400 <= r.status_code < 500:
+            try:
+                msg = r.json().get("message", "unknown")
+            except Exception as e:
+                msg = "unknown"
             raise HTTPError("{} Error: {}".format(
-                r.status_code, r.json().get("message", "unknown")))
+                r.status_code, msg))
         r.raise_for_status()
         return r.json()
 
@@ -155,8 +167,12 @@ class BaseAPI(object):
         r = self.session.delete(url, *args, **kwargs)
         self.track_request(url, r.status_code, start)
         if 400 <= r.status_code < 500:
+            try:
+                msg = r.json().get("message", "unknown")
+            except Exception as e:
+                msg = "unknown"
             raise HTTPError("{} Error: {}".format(
-                r.status_code, r.json().get("message", "unknown")))
+                r.status_code, msg))
         r.raise_for_status()
         return r.json()
 
@@ -373,6 +389,12 @@ class LowLevelPublicAPI(BaseAPI):
             return res.get("timezone", None)
         return None
 
+    def get_file_state(self, file_id):
+        return self.get("/user/files/{}/state".format(file_id))
+    
+    def get_download_link(self, file_id):
+        return self.to_url("/user/files/{}/download".format(file_id))
+
 
 class LowLevelInternAPI(BaseAPI):
     def __init__(self, endpoint, api_key=None, tz_aware=True):
@@ -513,9 +535,11 @@ class LowLevelInternAPI(BaseAPI):
         res = self.get("/user/by_id", params=p, version="v1")
         return res
 
-    def query_organisations(self, name_search_string=None, partner_id=None):
+    def query_organisations(self, name_search_string=None, partner_id=None,
+                            active_test_package=None):
         params = HDict({"name_search_string": name_search_string, "limit": 100,
-                        "offset": 0, "partner_id": partner_id})
+                        "offset": 0, "partner_id": partner_id,
+                        "active_test_package": active_test_package})
         all_res = []
         while True:
             res = self.get("/organisation/list", params=params, version="v1")
@@ -526,8 +550,40 @@ class LowLevelInternAPI(BaseAPI):
                 params["offset"] = res["pagination"]["next_offset"]
         return all_res
 
-    def getOrganisationList(self):
-        res = self.get("/organisationlist")
+    def query_accounts(self, name_search_string=None, partner_id=None):
+        params = HDict({"name_search_string": name_search_string, "limit": 100,
+                        "offset": 0, "partner_id": partner_id})
+        all_res = []
+        while True:
+            res = self.get("/account/list", params=params, version="v1")
+            all_res += res["data"]
+            if len(res["data"]) < params["limit"]:
+                break
+            else:
+                params["offset"] = res["pagination"]["next_offset"]
+        return all_res
+
+    def get_account(self, account_id):
+        res = self.get("/account/{}".format(account_id), version="v1")
+        return res
+
+    def get_partner_list(self):
+        res = self.get("/account/partner_list", version="v1")
+        return res
+
+    def create_billing_report(self, partner_id):
+        res = self.get("/account/{}/billing_report".format(partner_id), version="v1")
+        return res
+
+    def update_account_infos(self, account_id, partner_id=None,
+                             account_nr=None, owner_id=None,
+                             billing_emails=None):
+        p = HDict({"partner_id": partner_id,
+                   "account_nr": account_nr,
+                   "owner_id": owner_id,
+                   "billing_emails": billing_emails})
+        res = self.put("/account/{}/internal_information".format(account_id),
+                       json=p, version="v1")
         return res
 
     def getAnimal(self, animal_id):
@@ -544,6 +600,23 @@ class LowLevelInternAPI(BaseAPI):
         p = HDict({"organisation_id": organisation_id,
                    "partner_id": partner_id})
         res = self.post("/organisation/partner_id", json=p, version="v1")
+        return res
+
+    def update_organisation_infos(self, organisation_id, partner_id=None,
+                                  service_model_mode=None, country_code=None):
+        p = HDict({"service_model_mode": service_model_mode,
+                   "partner_id": partner_id,
+                   "country_code": country_code})
+        if country_code is not None:
+            raise RuntimeError("country_code not supported")
+        res = self.put("/organisation/{}/internal_information".format(organisation_id),
+                       json=p, version="v1")
+        return res
+
+    def activate_test_package(self, organisation_id, end_date):
+        p = HDict({"end_date": end_date.isoformat()})
+        res = self.put("/organisation/{}/activate_test_package".format(organisation_id),
+                       json=p, version="v1")
         return res
 
     def get_devices_seen(self, device_id, hours_back=24, return_sum=True, to_ts=None):
@@ -642,6 +715,13 @@ class LowLevelInternAPI(BaseAPI):
     def move_animal(self, animal_id, organisation_id):
         p = HDict({"animal_id": animal_id, "organisation_id": organisation_id})
         res = self.post("/organisation/move_animal", json=p, version="v1")
+        return res
+
+    def set_device_defect(self, device_id, defect_date, defect_info):
+        p = HDict({"defect_date": defect_date.isoformat(),
+                   "defect_info": defect_info})
+        res = self.put("/devices/{}/defect".format(device_id),
+                       json=p, version="v1")
         return res
 
     def getGroupSensorDataBulk(self, group_id, metrics, from_date, to_date):

@@ -10,7 +10,7 @@ from .low import LowLevelPublicAPI, LowLevelInternAPI
 from .models import User, Animal, Organisation, Annotation
 from .helper import fromTS, toTS
 
-__version__ = '0.14'
+__version__ = '0.15'
 
 
 class API(object):
@@ -265,8 +265,8 @@ class LowLevelAPI(object):
 
     # Organisation Calls
 
-    def query_organisations(self, name_search_string=None, partner_id=None):
-        return self.privatelow.query_organisations(name_search_string, partner_id)
+    def query_organisations(self, name_search_string=None, partner_id=None, active_test_package=None):
+        return self.privatelow.query_organisations(name_search_string, partner_id, active_test_package)
 
     def update_organisation_partner(self, organisation_id, partner_id):
         return self.privatelow.update_organisation_partner(organisation_id, partner_id)
@@ -319,3 +319,38 @@ class LowLevelAPI(object):
 
     def insertGroupSensorDataBulk(self, sensordata):
         return self.privatelow.insertGroupSensorDataBulk(sensordata)
+
+    # Other Stuff
+
+    def set_device_defect(self, device_id, defect_date, defect_info):
+        return self.privatelow.set_device_defect(device_id, defect_date, defect_info)
+
+    def update_organisation_infos(self, organisation_id, partner_id=None,
+                                  service_model_mode=None, country_code=None):
+        return self.privatelow.update_organisation_infos(
+            organisation_id, partner_id=partner_id,
+            service_model_mode=service_model_mode, country_code=country_code)
+
+    def activate_test_package(self, organisation_id, end_date):
+        return self.privatelow.activate_test_package(organisation_id, end_date)
+
+    def query_accounts(self, name_search_string=None, partner_id=None):
+        return self.privatelow.query_accounts(name_search_string=name_search_string,
+                                              partner_id=partner_id)
+
+    def get_account(self, account_id):
+        return self.privatelow.get_account(account_id)
+
+    def get_partner_list(self):
+        return self.privatelow.get_partner_list()
+
+    def create_billing_report(self, partner_id):
+        assert False
+        return self.privatelow.create_billing_report(partner_id)
+
+    def update_account_infos(self, account_id, partner_id=None,
+                             account_nr=None, owner_id=None,
+                             billing_emails=None):
+        return self.privatelow.update_account_infos(
+            account_id, partner_id=partner_id, account_nr=account_nr, owner_id=owner_id,
+            billing_emails=billing_emails)
