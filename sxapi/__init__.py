@@ -1,14 +1,11 @@
 #!/usr/bin/python
 # coding: utf8
 
-import time
-import logging
-import requests
 import warnings
 
 from .low import LowLevelPublicAPI, LowLevelInternAPI
 from .models import User, Animal, Organisation, Annotation
-from .helper import fromTS, toTS
+from .helper import toTS
 
 __version__ = '0.15'
 

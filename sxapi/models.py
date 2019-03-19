@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # coding: utf8
 
-import time
 import pendulum
 import datetime
 import math
@@ -164,7 +163,8 @@ class Events(object):
                 self._data = self.api.get_animal_events(self.parent._id, f, t)
             elif isinstance(self.parent, Device):
                 self._data = self.api.get_device_events(self.parent._id, f, t)
-            self._data = [Event.create_from_data(api=self.api, data=x, timezone=parent.timezone) for x in self._data]
+            self._data = [Event.create_from_data(
+                api=self.api, data=x, timezone=self.parent.timezone) for x in self._data]
             self._data.sort(key=lambda x: x.date)
         return self._data
 
@@ -378,13 +378,14 @@ class Animal(APIObject, DataMixin, EventMixin):
     def to_dim(self, dt):
         return self.fast_dim_range(dt, dt)[0][1]
 
-    def fast_dim_range(self, from_dt, to_dt, interval=60*60, timestamp=False):
+    def fast_dim_range(self, from_dt, to_dt, interval=60 * 60, timestamp=False):
         out = []
         cdt = pendulum.instance(to_dt)
 
         all_lactations = []
         for lac in self.lactations:
-            all_lactations.append(pendulum.instance(lac.date.replace(hour=0, minute=0, second=0, microsecond=0)))
+            all_lactations.append(pendulum.instance(
+                lac.date.replace(hour=0, minute=0, second=0, microsecond=0)))
 
         lac_idx = 1
         while from_dt <= cdt:
@@ -393,17 +394,17 @@ class Animal(APIObject, DataMixin, EventMixin):
                 cdt = cdt.subtract(seconds=interval)
                 continue
             elif lac_idx >= len(all_lactations):
-                dim = math.floor((cdt - all_lactations[-lac_idx]).total_seconds() / (24*60*60))
+                dim = math.floor((cdt - all_lactations[-lac_idx]).total_seconds() / (24 * 60 * 60))
                 if dim < -14:
                     dim = -14.5
                 out.append((cdt, dim))
                 cdt = cdt.subtract(seconds=interval)
                 continue
             elif lac_idx < len(all_lactations):
-                dim = math.floor((cdt - all_lactations[-lac_idx]).total_seconds() / (24*60*60))
+                dim = math.floor((cdt - all_lactations[-lac_idx]).total_seconds() / (24 * 60 * 60))
                 while len(all_lactations) > lac_idx and all_lactations[-lac_idx].subtract(days=14) > cdt:
                     lac_idx += 1
-                    dim = math.floor((cdt - all_lactations[-lac_idx]).total_seconds() / (24*60*60))
+                    dim = math.floor((cdt - all_lactations[-lac_idx]).total_seconds() / (24 * 60 * 60))
                 out.append((cdt, dim))
                 cdt = cdt.subtract(seconds=interval)
                 continue
@@ -413,7 +414,7 @@ class Animal(APIObject, DataMixin, EventMixin):
             out = [(toTS(ts), v) for ts, v in out]
         return list(reversed(out))
 
-    def dim_range(self, from_dt, to_dt, interval=60*60, timestamp=False):
+    def dim_range(self, from_dt, to_dt, interval=60 * 60, timestamp=False):
         return self.fast_dim_range(from_dt, to_dt, interval=interval, timestamp=timestamp)
 
     # def toDIM(self, dt):

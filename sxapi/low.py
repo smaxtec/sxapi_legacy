@@ -73,7 +73,7 @@ class BaseAPI(object):
     def to_url(self, path, version_modifier=None):
         url = "{}{}".format(self.api_base_url, path)
         if version_modifier is not None:
-            url = re.sub('\/[vV][0-9]+\/',
+            url = re.sub(r'\/[vV][0-9]+\/',
                          "/{}/".format(version_modifier), url)
         return url
 
@@ -391,7 +391,7 @@ class LowLevelPublicAPI(BaseAPI):
 
     def get_file_state(self, file_id):
         return self.get("/user/files/{}/state".format(file_id))
-    
+
     def get_download_link(self, file_id):
         return self.to_url("/user/files/{}/download".format(file_id))
 

@@ -6,7 +6,6 @@ import collections
 import pendulum
 import time
 import functools
-import pendulum
 
 
 def toTS(dt):
@@ -54,10 +53,10 @@ def splitDateRange(start, end, days):
     last = f
     # left = end - start
     for i in range(f, t - diff, diff):
-        last = i+diff-1
+        last = i + diff - 1
         yield (fromTS(i), fromTS(last))
     if last < t:
-        yield (fromTS(last+1), fromTS(t))
+        yield (fromTS(last + 1), fromTS(t))
 
 
 def splitTimeRange(start, end, days):
@@ -68,10 +67,10 @@ def splitTimeRange(start, end, days):
     last = f
     # left = end - start
     for i in range(f, t - diff, diff):
-        last = i+diff-1
+        last = i + diff - 1
         yield (i, last)
     if last < t:
-        yield (last+1, t)
+        yield (last + 1, t)
 
 
 class Memoize(object):
@@ -79,6 +78,7 @@ class Memoize(object):
     If called later with the same arguments, the cached value is returned
     (not reevaluated).
     '''
+
     def __init__(self, func):
         self.func = func
         self.cache = {}
