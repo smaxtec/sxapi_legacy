@@ -13,6 +13,7 @@ from .helper import splitTimeRange, Memoize
 
 
 PUBLIC_API = "https://api.smaxtec.com/api/v1"
+PUBLIC_API_v2 = "https://api.smaxtec.com/api/v2"
 
 
 class Req(object):
@@ -175,6 +176,62 @@ class BaseAPI(object):
                 r.status_code, msg))
         r.raise_for_status()
         return r.json()
+
+
+class PublicAPIv2(BaseAPI):
+    def __init__(self, email=None, password=None, api_key=None, endpoint=None,
+                 tz_aware=True):
+        """Initialize a new PublicAPIv2 client instance.
+        """
+        ep = endpoint or PUBLIC_API_v2
+        super(PublicAPIv2, self).__init__(
+            ep, email=email, password=password, api_key=api_key,
+            tz_aware=tz_aware)
+
+    def get_animals_by_organisation_id(self, organisation_id):
+        return self.get(f'/organisations/{organisation_id}/animals')
+
+    def get_data_by_animal_id(self, animal_id, from_date, to_date,
+                              metrics, preferred_units=None,
+                              aggregation_period=None, timestamp_format=None):
+        params = HDict({
+            'from_date': from_date,
+            'to_date': to_date,
+            'metrics': metrics,
+            'preferred_units': preferred_units,
+            'aggregation_period': aggregation_period,
+            'timestamp_format': timestamp_format
+        })
+        return self.get(f'/data/animals/{animal_id}.json', params=params)
+
+
+class PrivateAPIv2(BaseAPI):
+    def __init__(self, endpoint, api_key=None, tz_aware=True):
+        """Initialize a new private APIv2 client instance.
+        """
+        if not endpoint:
+            raise ValueError("Endpoint needed for private API")
+        super(PrivateAPIv2, self).__init__(
+            endpoint, api_key=api_key, tz_aware=tz_aware)
+
+    # def get_all_organisations(self):
+    #     return self.get("/organisations")
+
+    # def get_organisations_by_id(self, organisation_ids):
+    #     params = HDict({"organisation_ids": organisation_ids})
+    #     return self.get("/organisations/by_ids", params=params)
+
+    # def get_animals_by_organisation_id(self, organisation_id):
+    #     params = HDict({'organisation_id': organisation_id})
+    #     return self.get("/organisations/animals/by_id", params=params)
+
+    def get_data_by_animal_id(self, animal_id, from_date, to_date, metrics):
+        params = HDict({
+            'from_date': from_date,
+            'to_date': to_date,
+            'metrics': metrics
+        })
+        return self.get(f'/{animal_id}/data.json', params=params)
 
 
 class LowLevelPublicAPI(BaseAPI):
