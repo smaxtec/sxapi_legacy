@@ -3,7 +3,7 @@
 
 import warnings
 
-from .low import LowLevelPublicAPI, LowLevelInternAPI
+from .low import LowLevelPublicAPI, LowLevelInternAPI, PublicAPIv2
 from .models import User, Animal, Organisation, Annotation
 from .helper import toTS
 
@@ -42,6 +42,14 @@ class API(object):
 
     def get_organisation(self, organisation_id):
         return Organisation(api=self.low, _id=organisation_id)
+
+
+class APIv2(object):
+    def __init__(self, email=None, password=None, api_key=None, endpoint=None, tz_aware=True):
+        """Initialize a new API client instance.
+        """
+        self.low = PublicAPIv2(email=email, password=password, api_key=api_key,
+                               endpoint=endpoint, tz_aware=tz_aware)
 
 
 class LowLevelAPI(object):
