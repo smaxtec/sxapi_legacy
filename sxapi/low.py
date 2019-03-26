@@ -106,6 +106,8 @@ class BaseAPI(object):
             raise ValueError("email and password are needed for API access")
         params = {"email": self.email, "password": self.password}
         res = self._session.get(self.to_url("/user/get_token"), params=params)
+        if self._async:
+            res = res.result()
         if res.status_code == requests.codes.ok:
             pass
         elif res.status_code == 401 or res.status_code == 409 or res.status_code == 422:
@@ -123,6 +125,8 @@ class BaseAPI(object):
         url = self.to_url(path, version)
         start = time.time()
         r = self.session.get(url, *args, **kwargs)
+        if self._async:
+            r = r.result()
         self.track_request(url, r.status_code, start)
         if 400 <= r.status_code < 500:
             try:
@@ -139,6 +143,8 @@ class BaseAPI(object):
         url = self.to_url(path, version)
         start = time.time()
         r = self.session.post(url, *args, allow_redirects=False, **kwargs)
+        if self._async:
+            r = r.result()
         self.track_request(url, r.status_code, start)
         if r.status_code == 301:
             raise HTTPError("301 redirect for POST")
@@ -157,6 +163,8 @@ class BaseAPI(object):
         url = self.to_url(path, version)
         start = time.time()
         r = self.session.put(url, *args, allow_redirects=False, **kwargs)
+        if self._async:
+            r = r.result()
         self.track_request(url, r.status_code, start)
         if r.status_code == 301:
             raise HTTPError("301 redirect for PUT")
@@ -175,6 +183,8 @@ class BaseAPI(object):
         url = self.to_url(path, version)
         start = time.time()
         r = self.session.delete(url, *args, **kwargs)
+        if self._async:
+            r = r.result()
         self.track_request(url, r.status_code, start)
         if 400 <= r.status_code < 500:
             try:
