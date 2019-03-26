@@ -45,11 +45,13 @@ class API(object):
 
 
 class APIv2(object):
-    def __init__(self, email=None, password=None, api_key=None, endpoint=None, tz_aware=True):
+    def __init__(self, email=None, password=None, api_key=None, endpoint=None,
+                 tz_aware=True, asynchronous=False):
         """Initialize a new API client instance.
         """
-        self.low = PublicAPIv2(email=email, password=password, api_key=api_key,
-                               endpoint=endpoint, tz_aware=tz_aware)
+        self.low = PublicAPIv2(
+            email=email, password=password, api_key=api_key, endpoint=endpoint,
+            tz_aware=tz_aware, asynchronous=asynchronous)
 
 
 class LowLevelAPI(object):
