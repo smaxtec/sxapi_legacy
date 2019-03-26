@@ -7,6 +7,8 @@ import logging
 import requests
 import re
 from requests.exceptions import HTTPError
+from requests_futures.sessions import FuturesSession
+from concurrent.futures import ThreadPoolExecutor
 
 from .models import HDict
 from .helper import splitTimeRange, Memoize
@@ -32,7 +34,8 @@ class Req(object):
 
 
 class BaseAPI(object):
-    def __init__(self, base_url, email=None, password=None, api_key=None, tz_aware=True):
+    def __init__(self, base_url, email=None, password=None, api_key=None,
+                 tz_aware=True, asynchronous=False):
         """Initialize a new base low level API client instance.
         """
         self.api_base_url = base_url.rstrip("/")
@@ -47,12 +50,18 @@ class BaseAPI(object):
         self.requests = []
         self.tz_aware = tz_aware
 
+        self._async = asynchronous
+
     @property
     def session(self):
         """Geneate a new HTTP session on the fly and login.
         """
         if not self._session:
-            self._session = requests.Session()
+            if not self._async:
+                self._session = requests.Session()
+            else:
+                self._session = FuturesSession(
+                    executor=ThreadPoolExecutor(max_workers=20))
         # check login
         if not self._login():
             raise ValueError("invalid login information")
