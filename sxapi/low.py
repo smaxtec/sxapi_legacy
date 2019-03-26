@@ -138,6 +138,34 @@ class BaseAPI(object):
         r.raise_for_status()
         return r.json()
 
+    def async_get(self, paths, *args, **kwargs):
+        if not self._async:
+            raise NotImplementedError(
+                'async_get is only available with an asynchronous session')
+
+        version = kwargs.pop("version", None)
+        futures = []
+        async for path in paths:
+            url = self.to_url(path, version)
+            start = time.time()
+            r = self.session.get(url, *args, **kwargs)
+            futures.append(r)
+
+        result = []
+        for future in futures:
+            r = future.result()
+            self.track_request(url, r.status_code, start)
+            if 400 <= r.status_code < 500:
+                try:
+                    msg = r.json().get("message", "unknown")
+                except Exception as e:
+                    msg = "unknown"
+                raise HTTPError("{} Error: {}".format(
+                    r.status_code, msg))
+            r.raise_for_status()
+            result.append(r.json())
+        return result
+
     def post(self, path, *args, **kwargs):
         version = kwargs.pop("version", None)
         url = self.to_url(path, version)
