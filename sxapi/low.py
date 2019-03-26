@@ -189,13 +189,13 @@ class BaseAPI(object):
 
 class PublicAPIv2(BaseAPI):
     def __init__(self, email=None, password=None, api_key=None, endpoint=None,
-                 tz_aware=True):
+                 tz_aware=True, asynchronous=False):
         """Initialize a new PublicAPIv2 client instance.
         """
         ep = endpoint or PUBLIC_API_v2
         super(PublicAPIv2, self).__init__(
             ep, email=email, password=password, api_key=api_key,
-            tz_aware=tz_aware)
+            tz_aware=tz_aware, asynchronous=asynchronous)
 
     def get_animals_by_organisation_id(self, organisation_id):
         return self.get(f'/organisations/{organisation_id}/animals')
@@ -215,13 +215,15 @@ class PublicAPIv2(BaseAPI):
 
 
 class PrivateAPIv2(BaseAPI):
-    def __init__(self, endpoint, api_key=None, tz_aware=True):
+    def __init__(self, endpoint, api_key=None, tz_aware=True,
+                 asynchronous=False):
         """Initialize a new private APIv2 client instance.
         """
         if not endpoint:
             raise ValueError("Endpoint needed for private API")
         super(PrivateAPIv2, self).__init__(
-            endpoint, api_key=api_key, tz_aware=tz_aware)
+            endpoint, api_key=api_key, tz_aware=tz_aware,
+            asynchronous=asynchronous)
 
     # def get_all_organisations(self):
     #     return self.get("/organisations")
@@ -248,8 +250,9 @@ class LowLevelPublicAPI(BaseAPI):
         """Initialize a new low level API client instance.
         """
         ep = endpoint or PUBLIC_API
-        super(LowLevelPublicAPI, self).__init__(ep, email=email,
-                                                password=password, api_key=api_key, tz_aware=tz_aware)
+        super(LowLevelPublicAPI, self).__init__(
+            ep, email=email, password=password, api_key=api_key,
+            tz_aware=tz_aware)
 
     def get_status(self):
         return self.get("/service/status")
