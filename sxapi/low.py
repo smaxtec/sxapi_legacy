@@ -138,7 +138,7 @@ class BaseAPI(object):
         r.raise_for_status()
         return r.json()
 
-    def async_get(self, paths, *args, **kwargs):
+    async def async_get(self, paths, *args, **kwargs):
         if not self._async:
             raise NotImplementedError(
                 'async_get is only available with an asynchronous session')
@@ -237,6 +237,11 @@ class PublicAPIv2(BaseAPI):
 
     def get_animals_by_organisation_id(self, organisation_id):
         return self.get(f'/organisations/{organisation_id}/animals')
+
+    def get_animals_by_organisation_ids_async(self, organisation_ids):
+        return await self.async_get(
+            [f'/organisations/{organisation_id}/animals' for organisation_id
+             in organisation_ids])
 
     def get_data_by_animal_id(self, animal_id, from_date, to_date,
                               metrics, preferred_units=None,
