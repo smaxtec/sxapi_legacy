@@ -146,7 +146,7 @@ class BaseAPI(object):
 
         version = kwargs.pop("version", None)
         futures = []
-        async for path in iter(paths):
+        async for path in (x for x in paths):
             url = self.to_url(path, version)
             start = time.time()
             r = self.session.get(url, *args, **kwargs)
