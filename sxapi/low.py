@@ -6,6 +6,7 @@ import time
 import logging
 import requests
 import re
+import asyncio
 from requests.exceptions import HTTPError
 from requests_futures.sessions import FuturesSession
 from concurrent.futures import ThreadPoolExecutor
@@ -239,9 +240,9 @@ class PublicAPIv2(BaseAPI):
         return self.get(f'/organisations/{organisation_id}/animals')
 
     def get_animals_by_organisation_ids_async(self, organisation_ids):
-        return self.async_get(
-            [f'/organisations/{organisation_id}/animals' for organisation_id
-             in organisation_ids])
+        endpoints = [f'/organisations/{organisation_id}/animals' for
+                     organisation_id in organisation_ids]
+        return asyncio.run(self.async_get(endpoints))
 
     def get_data_by_animal_id(self, animal_id, from_date, to_date,
                               metrics, preferred_units=None,
