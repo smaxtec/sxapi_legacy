@@ -153,17 +153,20 @@ class BaseAPI(object):
 
         result = []
         for future in futures:
-            r = future.result()
-            self.track_request(url, r.status_code, start)
-            if 400 <= r.status_code < 500:
-                try:
-                    msg = r.json().get("message", "unknown")
-                except Exception as e:
-                    msg = "unknown"
-                raise HTTPError("{} Error: {}".format(
-                    r.status_code, msg))
-            r.raise_for_status()
-            result.append(r.json())
+            try:
+                r = future.result()
+                self.track_request(url, r.status_code, start)
+                if 400 <= r.status_code < 500:
+                    try:
+                        msg = r.json().get("message", "unknown")
+                    except Exception as e:
+                        msg = "unknown"
+                    raise HTTPError("{} Error: {}".format(
+                        r.status_code, msg))
+                r.raise_for_status()
+                result.append(r.json())
+            except Exception as e:
+                print(e)
         return result
 
     def post(self, path, *args, **kwargs):
