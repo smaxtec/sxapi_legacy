@@ -6,7 +6,6 @@ import time
 import logging
 import requests
 import re
-import asyncio
 from requests.exceptions import HTTPError
 from requests_futures.sessions import FuturesSession
 from concurrent.futures import ThreadPoolExecutor
@@ -139,14 +138,14 @@ class BaseAPI(object):
         r.raise_for_status()
         return r.json()
 
-    async def async_get(self, paths, *args, **kwargs):
+    def async_get(self, paths, *args, **kwargs):
         if not self._async:
             raise NotImplementedError(
                 'async_get is only available with an asynchronous session')
 
         version = kwargs.pop("version", None)
         futures = []
-        async for path in (x for x in paths):
+        for path in paths:
             url = self.to_url(path, version)
             start = time.time()
             r = self.session.get(url, *args, **kwargs)
@@ -242,7 +241,7 @@ class PublicAPIv2(BaseAPI):
     def get_animals_by_organisation_ids_async(self, organisation_ids):
         endpoints = [f'/organisations/{organisation_id}/animals' for
                      organisation_id in organisation_ids]
-        return asyncio.run(self.async_get(endpoints))
+        return self.async_get(endpoints)
 
     def get_data_by_animal_id(self, animal_id, from_date, to_date,
                               metrics, preferred_units=None,
