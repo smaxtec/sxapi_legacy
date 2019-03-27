@@ -259,6 +259,23 @@ class PublicAPIv2(BaseAPI):
         })
         return self.get(f'/data/animals/{animal_id}.json', params=params)
 
+    def get_data_by_animal_ids_async(self, animal_ids, from_date, to_date,
+                                     metrics, preferred_units=None,
+                                     aggregation_period=None,
+                                     timestamp_format=None):
+
+        params = HDict({
+            'from_date': from_date,
+            'to_date': to_date,
+            'metrics': metrics,
+            'preferred_units': preferred_units,
+            'aggregation_period': aggregation_period,
+            'timestamp_format': timestamp_format
+        })
+        endpoints = [f'/data/animals/{animal_id}.json' for
+                     animal_id in animal_ids]
+        return self.async_get(endpoints, params=params)
+
 
 class PrivateAPIv2(BaseAPI):
     def __init__(self, endpoint, api_key=None, tz_aware=True,
