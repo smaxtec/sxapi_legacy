@@ -239,7 +239,7 @@ class PublicAPIv2(BaseAPI):
         return self.get(f'/organisations/{organisation_id}/animals')
 
     def get_animals_by_organisation_ids_async(self, organisation_ids):
-        return await self.async_get(
+        return self.async_get(
             [f'/organisations/{organisation_id}/animals' for organisation_id
              in organisation_ids])
 
