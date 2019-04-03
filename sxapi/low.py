@@ -149,12 +149,14 @@ class BaseAPI(object):
             url = self.to_url(path, version)
             start = time.time()
             r = self.session.get(url, *args, **kwargs)
-            futures.append(r)
+            futures.append((url, r, start))
 
         result = []
         for future in futures:
             try:
-                r = future.result()
+                url = future[0]
+                r = future[1].result()
+                start = future[3]
                 self.track_request(url, r.status_code, start)
                 if 400 <= r.status_code < 500:
                     try:
@@ -164,7 +166,7 @@ class BaseAPI(object):
                     raise HTTPError("{} Error: {}".format(
                         r.status_code, msg))
                 r.raise_for_status()
-                result.append(r.json())
+                result.append((r.json(), url))
             except Exception as e:
                 print(e)
         return result
