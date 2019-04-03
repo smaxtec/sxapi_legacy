@@ -156,7 +156,7 @@ class BaseAPI(object):
             try:
                 url = future[0]
                 r = future[1].result()
-                start = future[3]
+                start = future[2]
                 self.track_request(url, r.status_code, start)
                 if 400 <= r.status_code < 500:
                     try:
