@@ -278,6 +278,13 @@ class PublicAPIv2(BaseAPI):
                      animal_id in animal_ids]
         return self.async_get(endpoints, params=params)
 
+    def get_events_by_animal_id(self, animal_id, deleted_events=False):
+        params = HDict({
+            'deleted_events': deleted_events
+        })
+
+        return self.get(f'/data/animals/{animal_id}/events', params=params)
+
 
 class PrivateAPIv2(BaseAPI):
     def __init__(self, endpoint, api_key=None, tz_aware=True,
