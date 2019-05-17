@@ -314,7 +314,7 @@ class PrivateAPIv2(BaseAPI):
             'deleted_events': deleted_events
         })
 
-        return self.get(f'/data/animals/{animal_id}/events', params=params)
+        return self.get(f'/animals/{animal_id}/events', params=params)
 
 
 class LowLevelPublicAPI(BaseAPI):
