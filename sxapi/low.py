@@ -15,6 +15,7 @@ from .helper import splitTimeRange, Memoize
 
 
 PUBLIC_API = "https://api.smaxtec.com/api/v1"
+PUBLIC_API_V2 = "https://api.smaxtec.com/api/v2"
 
 
 class Req(object):
@@ -73,7 +74,10 @@ class BaseAPI(object):
         return out
 
     def to_url(self, path, version_modifier=None):
-        url = "{}{}".format(self.api_base_url, path)
+        base_url = self.api_base_url
+        if path.startswith('/data'):
+            base_url = PUBLIC_API_V2.rstrip("/")
+        url = "{}{}".format(base_url, path)
         if version_modifier is not None:
             url = re.sub('\/[vV][0-9]+\/',
                          "/{}/".format(version_modifier), url)
@@ -112,6 +116,11 @@ class BaseAPI(object):
 
     def get(self, path, *args, **kwargs):
         version = kwargs.pop("version", None)
+        if kwargs["params"] is not None and path.startswith('/data'):
+            if kwargs["params"].get("animal_id", None) is not None:
+                path = "/data/animals/{}.json".format(kwargs["params"]["animal_id"])
+            elif kwargs["params"].get("device_id", None) is not None:
+                path = "/data/devices/{}.json".format(kwargs["params"]["device_id"])
         url = self.to_url(path, version)
         start = time.time()
         r = self.session.get(url, *args, **kwargs)
@@ -223,24 +232,26 @@ class LowLevelPublicAPI(BaseAPI):
         data = []
         for f, t in splitTimeRange(from_date, to_date, 100):
             data += self._get_device_sensordata(device_id,
-                                                metric, f, t)["data"]
+                                                metric, f, t)[0]["data"]
         return data
 
     def _get_device_sensordata(self, device_id, metric, from_date, to_date):
-        params = HDict({"device_id": device_id, "metric": metric,
-                        "from_date": from_date, "to_date": to_date})
+        params = HDict({"device_id": device_id, "metrics": metric,
+                        "from_date": pendulum.from_timestamp(from_date).isoformat(),
+                        "to_date": pendulum.from_timestamp(to_date).isoformat()})
         return self.get("/data/query", params=params)
 
     def get_animal_sensordata(self, animal_id, metric, from_date, to_date):
         data = []
         for f, t in splitTimeRange(from_date, to_date, 100):
             data += self._get_animal_sensordata(animal_id,
-                                                metric, f, t)["data"]
+                                                metric, f, t)[0]["data"]
         return data
 
     def _get_animal_sensordata(self, animal_id, metric, from_date, to_date):
-        params = HDict({"animal_id": animal_id, "metric": metric,
-                        "from_date": from_date, "to_date": to_date})
+        params = HDict({"animal_id": animal_id, "metrics": metric,
+                        "from_date": pendulum.from_timestamp(from_date).isoformat(),
+                        "to_date": pendulum.from_timestamp(to_date).isoformat()})
         return self.get("/data/query", params=params)
 
     def get_animal_events(self, animal_id, from_date=None, to_date=None,
