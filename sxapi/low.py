@@ -76,7 +76,7 @@ class BaseAPI(object):
     def to_url(self, path, version_modifier=None):
         base_url = self.api_base_url
         if path.startswith('/data'):
-            base_url = PUBLIC_API_V2.rstrip("/")
+            base_url = PUBLIC_API_V2
         url = "{}{}".format(base_url, path)
         if version_modifier is not None:
             url = re.sub('\/[vV][0-9]+\/',
