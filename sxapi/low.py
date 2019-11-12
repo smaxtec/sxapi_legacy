@@ -116,11 +116,6 @@ class BaseAPI(object):
 
     def get(self, path, *args, **kwargs):
         version = kwargs.pop("version", None)
-        if kwargs["params"] is not None and path.startswith('/data'):
-            if kwargs["params"].get("animal_id", None) is not None:
-                path = "/data/animals/{}.json".format(kwargs["params"]["animal_id"])
-            elif kwargs["params"].get("device_id", None) is not None:
-                path = "/data/devices/{}.json".format(kwargs["params"]["device_id"])
         url = self.to_url(path, version)
         start = time.time()
         r = self.session.get(url, *args, **kwargs)
@@ -239,7 +234,7 @@ class LowLevelPublicAPI(BaseAPI):
         params = HDict({"device_id": device_id, "metrics": metric,
                         "from_date": pendulum.from_timestamp(from_date).isoformat(),
                         "to_date": pendulum.from_timestamp(to_date).isoformat()})
-        return self.get("/data/query", params=params)
+        return self.get("/data/devices/{}.json".format(device_id), params=params)
 
     def get_animal_sensordata(self, animal_id, metric, from_date, to_date):
         data = []
@@ -252,7 +247,7 @@ class LowLevelPublicAPI(BaseAPI):
         params = HDict({"animal_id": animal_id, "metrics": metric,
                         "from_date": pendulum.from_timestamp(from_date).isoformat(),
                         "to_date": pendulum.from_timestamp(to_date).isoformat()})
-        return self.get("/data/query", params=params)
+        return self.get("/data/animals/{}.json".format(animal_id), params=params)
 
     def get_animal_events(self, animal_id, from_date=None, to_date=None,
                           limit=100, offset=0):
