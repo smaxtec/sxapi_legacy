@@ -163,8 +163,15 @@ class Events(object):
                 self._data = self.api.get_animal_events(self.parent._id, f, t)
             elif isinstance(self.parent, Device):
                 self._data = self.api.get_device_events(self.parent._id, f, t)
-            self._data = [Event.create_from_data(
-                api=self.api, data=x, timezone=self.parent.timezone) for x in self._data]
+
+            self._data = [
+                Event.create_from_data(
+                    api=self.api,
+                    data=x,
+                    timezone=self.parent.timezone
+                ) for x in self._data
+            ]
+
             self._data.sort(key=lambda x: x.date)
         return self._data
 

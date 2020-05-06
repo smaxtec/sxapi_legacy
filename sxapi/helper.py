@@ -3,14 +3,14 @@
 
 import datetime
 import collections
-import pendulum
 import time
 import functools
 
 
 def toTS(dt):
     if isinstance(dt, pendulum.DateTime):
-        base = dt.replace(year=1970, month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+        base = dt.replace(year=1970, month=1, day=1, hour=0,
+                          minute=0, second=0, microsecond=0)
         return int((dt - base).total_seconds())
     if isinstance(dt, datetime.datetime):
         return int((dt - datetime.datetime(1970, 1, 1)).total_seconds())

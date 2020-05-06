@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import time
-import mock
 
 from sxapi import API
 from .util import MockGet
@@ -25,8 +23,13 @@ class HighApiTests(unittest.TestCase):
         pass
 
     def test_status(self):
-        api = API(email=self.EMAIL, password=self.PASSWORD, endpoint=self.PUBLIC_ENDPOINT)
+        api = API(
+            email=self.EMAIL,
+            password=self.PASSWORD,
+            endpoint=self.PUBLIC_ENDPOINT
+        )
+
         with MockGet() as patched_session:
-            r = api.status
+            api.status
             call = patched_session.call_args_list
             self.assertEqual(call[0][0][0], "/service/status")

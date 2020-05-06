@@ -3,7 +3,6 @@
 
 import logging
 
-from requests.exceptions import HTTPError
 from flask import current_app
 from flask import _app_ctx_stack as stack
 
