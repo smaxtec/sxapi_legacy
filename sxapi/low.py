@@ -6,6 +6,8 @@ import time
 import logging
 import requests
 import re
+import pendulum
+
 from requests.exceptions import HTTPError
 from requests_futures.sessions import FuturesSession
 from concurrent.futures import ThreadPoolExecutor
@@ -884,3 +886,28 @@ class LowLevelInternAPI(BaseAPI):
                                      (point, s["metric"]))
         res = self.put("/groupsensordatabulk", json=data, timeout=25)
         return res
+
+
+class LowLevelInternAPIV2(BaseAPI):
+    def __init__(self, endpoint, api_key=None, tz_aware=True):
+        """Initialize a new low level intern API client instance.
+        """
+        if not endpoint:
+            raise ValueError("Endpoint needed for low level API")
+        super().__init__(
+            endpoint, api_key=api_key, tz_aware=tz_aware)
+
+    def create_device_update(self, name, update_type, update_content,
+                             information):
+        data = {
+            "name": name,
+            "update_type": update_type,
+            "update_content": update_content,
+            "information": information,
+            "create_ts": pendulum.now().isoformat()
+        }
+        return self.post("/devices/device_updates", json=data, timeout=25)
+
+    def schedule_device_update(self, device_id, device_update_id):
+        data = {"device_update_id": device_update_id}
+        return self.post(f"/devices/{device_id}/events/update_schedule", json=data, timeout=25)
