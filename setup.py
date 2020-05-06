@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 
 requirements = [
     'requests',
-    'pendulum>=2.0.2'
+    'pendulum~=2.0.2'
 ]
 
 test_requirements = [
