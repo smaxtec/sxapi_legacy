@@ -3,7 +3,6 @@
 
 import unittest
 import time
-import mock
 
 from .util import MockGet, MockPost, MockPut
 from sxapi import LowLevelAPI

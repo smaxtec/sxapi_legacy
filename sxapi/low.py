@@ -75,7 +75,7 @@ class BaseAPI(object):
     def to_url(self, path, version_modifier=None):
         url = "{}{}".format(self.api_base_url, path)
         if version_modifier is not None:
-            url = re.sub('\/[vV][0-9]+\/',
+            url = re.sub(r'\/[vV][0-9]+\/',
                          "/{}/".format(version_modifier), url)
         return url
 
@@ -119,7 +119,7 @@ class BaseAPI(object):
         if 400 <= r.status_code < 500:
             try:
                 msg = r.json().get("message", "unknown")
-            except Exception as e:
+            except Exception:
                 msg = "unknown"
             raise HTTPError("{} Error: {}".format(
                 r.status_code, msg))
@@ -137,7 +137,7 @@ class BaseAPI(object):
         if 400 <= r.status_code < 500:
             try:
                 msg = r.json().get("message", "unknown")
-            except Exception as e:
+            except Exception:
                 msg = "unknown"
             raise HTTPError("{} Error: {}".format(
                 r.status_code, msg))
@@ -155,7 +155,7 @@ class BaseAPI(object):
         if 400 <= r.status_code < 500:
             try:
                 msg = r.json().get("message", "unknown")
-            except Exception as e:
+            except Exception:
                 msg = "unknown"
             raise HTTPError("{} Error: {}".format(
                 r.status_code, msg))
@@ -171,7 +171,7 @@ class BaseAPI(object):
         if 400 <= r.status_code < 500:
             try:
                 msg = r.json().get("message", "unknown")
-            except Exception as e:
+            except Exception:
                 msg = "unknown"
             raise HTTPError("{} Error: {}".format(
                 r.status_code, msg))
