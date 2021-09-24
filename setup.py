@@ -13,17 +13,13 @@ test_requirements = ["pytest", "mock"]
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
-# parse version
-with open(
-    os.path.join(os.path.abspath(os.path.dirname(__file__)), "sxapi", "__init__.py")
-) as fdp:
-    pattern = re.compile(r".*__version__ = '(.*?)'", re.S)
-    VERSION = "0.15"
+VERSION = "0.15"
 
 config = {
     "description": "smaXtec API client",
     "author": "Matthias Wutte",
     "long_description": readme,
+    "long_description_content_type": "text/markdown",
     "url": "",
     "download_url": "https://github.com/smaxtec/sxapi_legacy",
     "author_email": "matthias.wutte@gmail.com",
