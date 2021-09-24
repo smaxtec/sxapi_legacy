@@ -25,7 +25,7 @@ config = {
     "author": "Matthias Wutte",
     "long_description": readme,
     "url": "",
-    "download_url": "https://github.com/wuttem",
+    "download_url": "https://github.com/smaxtec/sxapi_legacy",
     "author_email": "matthias.wutte@gmail.com",
     "version": VERSION,
     "install_requires": requirements,
