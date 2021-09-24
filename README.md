@@ -1,11 +1,15 @@
-# sxapi
+# sxapi_legacy
+
 smaXtec API Client
+
+:warning: **The API of this package is deprecated and will be changed with version 1.x** :warning:
 
 [![Build Status](https://travis-ci.org/wuttem/sxapi.svg?branch=develop)](https://travis-ci.org/wuttem/sxapi)
 
 Python wrapper for the smaXtec public API
 
-## Usage ##
+## Usage
+
 To use the API smaXtec user credentials (smaXtec Messenger Account) are needed.
 
 ```python
@@ -40,12 +44,12 @@ print a.get_animal("572209c1a80a5f54c631513f").dim_range(datetime.datetime(2018,
 a.print_stats()
 ```
 
-### Timezone Awareness ###
+### Timezone Awareness
 
 By default the API Client tries to make all datetimes timezone aware with pendulum datetime instances.
 See: https://pendulum.eustace.io/docs/
 
-To deactivate this behaviour create API Clients with *tz_aware=False*
+To deactivate this behaviour create API Clients with _tz_aware=False_
 
 ```python
 from sxapi import API
@@ -53,8 +57,7 @@ from sxapi import API
 a = API(email="myuser@smaxtec.com", password="mypassword", tz_aware=False)
 ```
 
-
-## Low Level Usage ##
+## Low Level Usage
 
 ```python
 from sxapi import LowLevelAPI
@@ -67,8 +70,8 @@ print a.get_animal_by_id("572209c1a80a5f54c631513f")
 print a.getAnimal("dsdsd") # from internal works only with api key
 ```
 
+## Flask Usage
 
-## Flask Usage ##
 The API Client includes a Flask Extension Module for usage of the LowLevel API.
 Usage is only possible with a permanent API Token and an internal endpoint.
 
@@ -108,10 +111,11 @@ if __name__ == "__main__":
     app.run()
 ```
 
-## Development ##
+## Development
 
 To build a new pip version increase version and tag with git tag -a "vX.X".
 Build artifacts and push to pip
+
 ```
 python setup.py sdist bdist_wheel
 twine upload dist/*

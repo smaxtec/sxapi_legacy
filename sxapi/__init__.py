@@ -7,15 +7,30 @@ from .low import LowLevelPublicAPI, LowLevelInternAPI
 from .models import User, Animal, Organisation, Annotation
 from .helper import toTS
 
-__version__ = '0.15'
+__version__ = "0.15"
+
+
+warnings.warn(
+    "deprecated: this package will break all APIs with version 1.x", ImportWarning
+)
 
 
 class API(object):
-    def __init__(self, email=None, password=None, api_key=None, endpoint=None, tz_aware=True):
-        """Initialize a new API client instance.
-        """
-        self.low = LowLevelPublicAPI(email=email, password=password, api_key=api_key,
-                                     endpoint=endpoint, tz_aware=tz_aware)
+    def __init__(
+        self, email=None, password=None, api_key=None, endpoint=None, tz_aware=True
+    ):
+        """Initialize a new API client instance."""
+        self.low = LowLevelPublicAPI(
+            email=email,
+            password=password,
+            api_key=api_key,
+            endpoint=endpoint,
+            tz_aware=tz_aware,
+        )
+        warnings.warn(
+            "deprecated: this package will break all APIs with version 1.x",
+            DeprecationWarning,
+        )
 
     @property
     def status(self):
@@ -31,8 +46,12 @@ class API(object):
 
     @property
     def organisations(self):
-        return [Organisation.create_from_data(api=self.low, data=x, _id=x["organisation_id"])
-                for x in self.low.get_organisations()]
+        return [
+            Organisation.create_from_data(
+                api=self.low, data=x, _id=x["organisation_id"]
+            )
+            for x in self.low.get_organisations()
+        ]
 
     def get_annotation(self, annotation_id):
         return Annotation(api=self.low, _id=annotation_id)
@@ -45,15 +64,27 @@ class API(object):
 
 
 class LowLevelAPI(object):
-    def __init__(self, email=None, password=None, private_endpoint=None, api_key=None,
-                 public_endpoint=None, tz_aware=True):
-        """Initialize a new API client instance.
-        """
-        self.publiclow = LowLevelPublicAPI(email=email, password=password, api_key=api_key,
-                                           endpoint=public_endpoint, tz_aware=tz_aware)
+    def __init__(
+        self,
+        email=None,
+        password=None,
+        private_endpoint=None,
+        api_key=None,
+        public_endpoint=None,
+        tz_aware=True,
+    ):
+        """Initialize a new API client instance."""
+        self.publiclow = LowLevelPublicAPI(
+            email=email,
+            password=password,
+            api_key=api_key,
+            endpoint=public_endpoint,
+            tz_aware=tz_aware,
+        )
         if private_endpoint is not None and api_key is not None:
-            self.privatelow = LowLevelInternAPI(endpoint=private_endpoint, api_key=api_key,
-                                                tz_aware=tz_aware)
+            self.privatelow = LowLevelInternAPI(
+                endpoint=private_endpoint, api_key=api_key, tz_aware=tz_aware
+            )
         else:
             pass
             # self.privatelow = self._privatelow
@@ -61,8 +92,7 @@ class LowLevelAPI(object):
 
     @property
     def _privatelow(self):
-        raise RuntimeError(
-            "internal API not accessable without endpoint and token")
+        raise RuntimeError("internal API not accessable without endpoint and token")
 
     # Status Calls
 
@@ -127,10 +157,14 @@ class LowLevelAPI(object):
             t = toTS(to_date)
         return self.publiclow.get_device_events(device_id, f, t)
 
-    def get_events_by_organisation(self, organisation_id, from_date, to_date, categories=None):
+    def get_events_by_organisation(
+        self, organisation_id, from_date, to_date, categories=None
+    ):
         f = toTS(from_date)
         t = toTS(to_date)
-        return self.publiclow.get_events_by_organisation(organisation_id, f, t, categories=categories)
+        return self.publiclow.get_events_by_organisation(
+            organisation_id, f, t, categories=categories
+        )
 
     def get_animals_by_organisation(self, organisation_id):
         return self.privatelow.get_animals_by_organisation(organisation_id)
@@ -178,11 +212,25 @@ class LowLevelAPI(object):
     def getLastSensorDataBulk(self, device_id, metrics):
         return self.privatelow.getLastSensorDataBulk(device_id, metrics)
 
-    def insertEvent(self, device_id, event_type, timestamp, value,
-                    metadata, level=10, disable_notifications=False):
-        return self.privatelow.insertEvent(device_id, event_type, timestamp, value,
-                                           metadata, level=level,
-                                           disable_notifications=disable_notifications)
+    def insertEvent(
+        self,
+        device_id,
+        event_type,
+        timestamp,
+        value,
+        metadata,
+        level=10,
+        disable_notifications=False,
+    ):
+        return self.privatelow.insertEvent(
+            device_id,
+            event_type,
+            timestamp,
+            value,
+            metadata,
+            level=level,
+            disable_notifications=disable_notifications,
+        )
 
     def updateEventMeta(self, device_id, _id, event_meta):
         return self.privatelow.updateEventMeta(device_id, _id, event_meta)
@@ -199,11 +247,15 @@ class LowLevelAPI(object):
     def deleteEvent(self, event_id):
         return self.privatelow.deleteEvent(event_id)
 
-    def getDevice(self, device_id, with_animal=True, with_organisation=True,
-                  with_allmeta=True):
-        return self.privatelow.getDevice(device_id, with_animal=with_animal,
-                                         with_organisation=with_organisation,
-                                         with_allmeta=with_allmeta)
+    def getDevice(
+        self, device_id, with_animal=True, with_organisation=True, with_allmeta=True
+    ):
+        return self.privatelow.getDevice(
+            device_id,
+            with_animal=with_animal,
+            with_organisation=with_organisation,
+            with_allmeta=with_allmeta,
+        )
 
     def get_interal_organisation_by_id(self, organisation_id):
         return self.privatelow.getOrganisation(organisation_id)
@@ -213,16 +265,22 @@ class LowLevelAPI(object):
 
     def getAnimal(self, animal_id):
         warnings.warn(
-            "getAnimal (internal) is deprecated. use get_animal_by_id", DeprecationWarning)
+            "getAnimal (internal) is deprecated. use get_animal_by_id",
+            DeprecationWarning,
+        )
         return self.privatelow.getAnimal(animal_id)
 
     def getOrganisationList(self):
         warnings.warn(
-            "getOrganisationList (internal) is deprecated. use query_organisations", DeprecationWarning)
+            "getOrganisationList (internal) is deprecated. use query_organisations",
+            DeprecationWarning,
+        )
         return self.privatelow.getOrganisationList()
 
     def get_devices_seen(self, device_id, hours_back=24, return_sum=True, to_ts=None):
-        return self.privatelow.get_devices_seen(device_id, hours_back, return_sum, to_ts)
+        return self.privatelow.get_devices_seen(
+            device_id, hours_back, return_sum, to_ts
+        )
 
     def getNodeInfos(self, device_id, from_date, to_date):
         return self.privatelow.getNodeInfos(device_id, from_date, to_date)
@@ -245,25 +303,42 @@ class LowLevelAPI(object):
         return self.publiclow.get_annotation_definition()
 
     def get_annotations_by_class(self, annotation_class, from_date, to_date):
-        return self.publiclow.get_annotations_by_class(annotation_class, from_date, to_date)
+        return self.publiclow.get_annotations_by_class(
+            annotation_class, from_date, to_date
+        )
 
     def get_annotations_by_organisation(self, organisation_id, from_date, to_date):
-        return self.publiclow.get_annotations_by_organisation(organisation_id, from_date, to_date)
+        return self.publiclow.get_annotations_by_organisation(
+            organisation_id, from_date, to_date
+        )
 
     def get_animal_annotations(self, animal_id, from_date, to_date):
         return self.publiclow.get_animal_annotations(animal_id, from_date, to_date)
 
     def insert_animal_annotation(self, animal_id, ts, end_ts, classes, attributes):
-        return self.publiclow.insert_animal_annotation(animal_id=animal_id, ts=ts,
-                                                       end_ts=end_ts, classes=classes, attributes=attributes)
+        return self.publiclow.insert_animal_annotation(
+            animal_id=animal_id,
+            ts=ts,
+            end_ts=end_ts,
+            classes=classes,
+            attributes=attributes,
+        )
 
-    def update_annotation(self, annotation_id, ts=None, end_ts=None, classes=None, attributes=None):
-        return self.publiclow.update_annotation(annotation_id, ts, end_ts, classes, attributes)
+    def update_annotation(
+        self, annotation_id, ts=None, end_ts=None, classes=None, attributes=None
+    ):
+        return self.publiclow.update_annotation(
+            annotation_id, ts, end_ts, classes, attributes
+        )
 
     # Organisation Calls
 
-    def query_organisations(self, name_search_string=None, partner_id=None, active_test_package=None):
-        return self.privatelow.query_organisations(name_search_string, partner_id, active_test_package)
+    def query_organisations(
+        self, name_search_string=None, partner_id=None, active_test_package=None
+    ):
+        return self.privatelow.query_organisations(
+            name_search_string, partner_id, active_test_package
+        )
 
     def update_organisation_partner(self, organisation_id, partner_id):
         return self.privatelow.update_organisation_partner(organisation_id, partner_id)
@@ -312,7 +387,9 @@ class LowLevelAPI(object):
         return self.publiclow.get_testset_by_name(name)
 
     def getGroupSensorDataBulk(self, group_id, metrics, from_date, to_date):
-        return self.privatelow.getGroupSensorDataBulk(group_id, metrics, from_date, to_date)
+        return self.privatelow.getGroupSensorDataBulk(
+            group_id, metrics, from_date, to_date
+        )
 
     def insertGroupSensorDataBulk(self, sensordata):
         return self.privatelow.insertGroupSensorDataBulk(sensordata)
@@ -322,18 +399,27 @@ class LowLevelAPI(object):
     def set_device_defect(self, device_id, defect_date, defect_info):
         return self.privatelow.set_device_defect(device_id, defect_date, defect_info)
 
-    def update_organisation_infos(self, organisation_id, partner_id=None,
-                                  service_model_mode=None, country_code=None):
+    def update_organisation_infos(
+        self,
+        organisation_id,
+        partner_id=None,
+        service_model_mode=None,
+        country_code=None,
+    ):
         return self.privatelow.update_organisation_infos(
-            organisation_id, partner_id=partner_id,
-            service_model_mode=service_model_mode, country_code=country_code)
+            organisation_id,
+            partner_id=partner_id,
+            service_model_mode=service_model_mode,
+            country_code=country_code,
+        )
 
     def activate_test_package(self, organisation_id, end_date):
         return self.privatelow.activate_test_package(organisation_id, end_date)
 
     def query_accounts(self, name_search_string=None, partner_id=None):
-        return self.privatelow.query_accounts(name_search_string=name_search_string,
-                                              partner_id=partner_id)
+        return self.privatelow.query_accounts(
+            name_search_string=name_search_string, partner_id=partner_id
+        )
 
     def get_account(self, account_id):
         return self.privatelow.get_account(account_id)
@@ -345,9 +431,18 @@ class LowLevelAPI(object):
         assert False
         return self.privatelow.create_billing_report(partner_id)
 
-    def update_account_infos(self, account_id, partner_id=None,
-                             account_nr=None, owner_id=None,
-                             billing_emails=None):
+    def update_account_infos(
+        self,
+        account_id,
+        partner_id=None,
+        account_nr=None,
+        owner_id=None,
+        billing_emails=None,
+    ):
         return self.privatelow.update_account_infos(
-            account_id, partner_id=partner_id, account_nr=account_nr, owner_id=owner_id,
-            billing_emails=billing_emails)
+            account_id,
+            partner_id=partner_id,
+            account_nr=account_nr,
+            owner_id=owner_id,
+            billing_emails=billing_emails,
+        )
